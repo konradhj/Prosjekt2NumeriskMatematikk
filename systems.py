@@ -33,7 +33,7 @@ def B_T(x):
 def A_T(x):
     a1 = 0
     a2 = 0.5 * (x[0] - np.log(np.sqrt(x[0]**2 + x[1]**2) + x[0]))
-    a3 = -0.5 * (x[2] * np.arctan(x[1]/x[0]) + np.log(x[0]**2 + x[1]**2))
+    a3 = -0.5 * (x[2] * np.arctan2(x[1], x[0]) + np.log(x[0]**2 + x[1]**2))
     return np.array([a1, a2, a3])
 
 def U_T(x):
