@@ -34,7 +34,7 @@ for model, B, A, J, U, G, x0, v0 in models:
         return np.concatenate((y[3:], np.cross(y[3:], B(y[:3])) - G(y[:3])))
     print("  Referanseløsning", flush=True)
     ref = solve_ivp(rhs, [0, T], np.concatenate((x0, v0)),
-                    t_eval=t, rtol=1e-12, atol=1e-14)
+                    t_eval=t, rtol=1e-12, atol=1e-14, method="DOP853")
     if not ref.success:
         raise RuntimeError(ref.message)
     x_ref = ref.y[:3].T
