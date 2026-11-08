@@ -67,3 +67,28 @@ def symmetric_multistep(x0, v0, B, A, jac_A, nabla_U, h, T):
         F_previous, F_current = F_current, F_next
 
     return t, x
+
+"""Defnerer Jacobi-matrisene"""
+def jac_A_2D(x):
+    x1, x2, _ = x
+    r = np.sqrt(x1**2 + x2**2)
+
+    return np.array([
+        [-x1*x2/r,    -r - x2**2/r, 0],
+        [r + x1**2/r,  x1*x2/r,    0],
+        [0,           0,           0]
+    ]) / 3
+
+
+def jac_A_T(x):
+    x1, x2, x3 = x
+    r2 = x1**2 + x2**2
+    r = np.sqrt(r2)
+
+    return np.array([
+        [0, 0, 0],
+        [(1 - 1/r)/2, -x2/(2*r*(r + x1)), 0],
+        [(x3*x2 - 2*x1)/(2*r2),
+         -(x3*x1 + 2*x2)/(2*r2),
+         -np.arctan2(x2, x1)/2]
+    ])
