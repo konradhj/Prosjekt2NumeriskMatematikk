@@ -16,10 +16,12 @@ x0_T = np.array([1.2, 0.0, 0.0])
 v0_T = np.array([0, 4.816e-4, -2.059e-3])
 x0_list = [x0_2D, x0_T]
 v0_list = [v0_2D, v0_T]
-dimension_names = ["2D Charged Particle", "Tokamak"]
+dimension_names = ["2D Charged Particle", "Tokamak field"]
 
-
+#Computing for 2D and Tokamak
 for dim in range(2):
+
+    #Initiating lists
     h_values = []
 
     rk4_errors = []
@@ -31,22 +33,29 @@ for dim in range(2):
     multi_times = []
 
     funcs = func_list[dim]
+    #Getting relevant functions
     B, A, U, gradU, jac_A = funcs
+
+    #Getting starting values
     x0 = x0_list[dim]
     v0 = v0_list[dim]
 
+    #Defining ODE for solve_ivp
     def rhs(t, y):
         x = y[:3]
         v = y[3:]
         return np.concatenate((v, f(x, v, B, gradU)))
 
+    #Looping through h values, starting with smallest
     for i in range(2, -1, -1):
         h_i = h/ (2)**i
 
+        #Computing reference
         y0 = np.concatenate((x0, v0))
         ref = solve_ivp(rhs,(0, T),y0,method="RK45",rtol=1e-12,atol=1e-12)
         x_ref = ref.y[:3, -1]
 
+        #Solving for each method and saving compute times
         start = time.perf_counter()
         x_rk4, v_rk4 = RK4(x0, v0, B, gradU, h_i, T)
         rk4_times.append(time.perf_counter() - start)
@@ -59,6 +68,7 @@ for dim in range(2):
         t_multi, x_multi = symmetric_multistep(x0, v0, B, A, jac_A, gradU, h_i, T)
         multi_times.append(time.perf_counter() - start)
 
+        #Computing and saving errors
         rk4_error = np.linalg.norm(x_rk4[-1] - x_ref)
         boris_error = np.linalg.norm(x_boris[-1] - x_ref)
         multi_error = np.linalg.norm(x_multi[-1] - x_ref)
@@ -67,9 +77,12 @@ for dim in range(2):
         boris_errors.append(boris_error)
         multi_errors.append(multi_error)
 
+        #Saving h values
         h_values.append(h_i)
 
     h_values = np.array(h_values)
+
+    #Plotting h vs error for all methods for one system at a time
     plt.title(f"Order verification for " + dimension_names[dim])
     plt.loglog(h_values, rk4_errors, 'o-', label='RK4')
     plt.loglog(h_values, boris_errors, 'o-', label='Boris')
@@ -90,6 +103,7 @@ for dim in range(2):
     plt.legend()
     plt.show()
 
+    #Plotting work-precison for all methods for one system at a time
     plt.title(f"Work–precision diagram " + dimension_names[dim])
     plt.loglog(rk4_errors, rk4_times, 'o-', label='RK4')
     plt.loglog(boris_errors, boris_times, 'o-', label='Boris')
