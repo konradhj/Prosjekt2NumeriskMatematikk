@@ -5,6 +5,7 @@ from scipy.integrate import solve_ivp
 import systems as s
 from RK4 import RK4
 from boris import boris_step
+from boris import run_boris
 from symmetric_multistep import symmetric_multistep, jac_A_2D, jac_A_T
 
 # 5a: kjør metodene og lag plottene for begge modellene.
